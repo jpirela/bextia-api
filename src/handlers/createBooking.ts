@@ -21,7 +21,7 @@ const schema: FieldDescriptor[] = [
   {
     "name": "viajero_telefono",
     "type": "text",
-    "pattern": "^+?[0-9]{7,15}$"
+    "pattern": "^\\+?[0-9]{7,15}$"
   },
   {
     "name": "viajero_email",

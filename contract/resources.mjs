@@ -3,7 +3,7 @@ export const CHANNELS = ["whatsapp", "email", "web", "form", "sim"];
 const LANGS = ["es", "en", "pt", "fr", "it", "de"];
 const URGENCY = ["baja", "media", "alta"];
 const AGENTS = ["leads", "incidents"];
-const PHONE = "^\+?[0-9]{7,15}$";
+const PHONE = "^\\+?[0-9]{7,15}$";
 
 export const resources = [
   { resource: "contact", singular: "Contact", plural: "Contacts", label: "contacto", fields: [
