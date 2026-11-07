@@ -1,0 +1,112 @@
+// Entidades del dominio (spec §4). build-contract.mjs genera list<Plural> y create<Singular> por cada una.
+export const CHANNELS = ["whatsapp", "email", "web", "form", "sim"];
+const LANGS = ["es", "en", "pt", "fr", "it", "de"];
+const URGENCY = ["baja", "media", "alta"];
+const AGENTS = ["leads", "incidents"];
+const PHONE = "^\+?[0-9]{7,15}$";
+
+export const resources = [
+  { resource: "contact", singular: "Contact", plural: "Contacts", label: "contacto", fields: [
+    { name: "nombre", type: "text" },
+    { name: "telefono", type: "text", pattern: PHONE },
+    { name: "email", type: "email" },
+    { name: "idioma", type: "enum", enum: LANGS },
+    { name: "mercado", type: "text" },
+    { name: "canal_preferido", type: "enum", enum: CHANNELS },
+  ] },
+  { resource: "conversation", singular: "Conversation", plural: "Conversations", label: "conversación", fields: [
+    { name: "contact_id", type: "uuid", required: true },
+    { name: "canal", type: "enum", enum: CHANNELS, required: true },
+    { name: "agente", type: "enum", enum: AGENTS },
+    { name: "estado", type: "enum", enum: ["abierta", "cerrada"] },
+  ] },
+  { resource: "message", singular: "Message", plural: "Messages", label: "mensaje", fields: [
+    { name: "conversation_id", type: "uuid", required: true },
+    { name: "canal", type: "enum", enum: CHANNELS, required: true },
+    { name: "direccion", type: "enum", enum: ["in", "out"], required: true },
+    { name: "contenido", type: "longtext", required: true },
+    { name: "external_id", type: "text", required: true },
+    { name: "agente", type: "enum", enum: AGENTS },
+  ] },
+  { resource: "lead", singular: "Lead", plural: "Leads", label: "lead", fields: [
+    { name: "contact_id", type: "uuid", required: true },
+    { name: "destino", type: "text" },
+    { name: "fecha_inicio", type: "date" },
+    { name: "fecha_fin", type: "date" },
+    { name: "viajeros", type: "integer", min: 1 },
+    { name: "interes", type: "text" },
+    { name: "urgencia", type: "enum", enum: URGENCY },
+    { name: "score", type: "integer", min: 0, max: 100 },
+    { name: "estado", type: "enum", enum: ["nuevo", "respondido", "cualificando", "cualificado", "asignado", "entregado"] },
+    { name: "sales_agent_id", type: "uuid" },
+    { name: "resumen_ia", type: "longtext" },
+    { name: "fuera_de_horario", type: "boolean" },
+    { name: "mercado", type: "text" },
+    { name: "idioma", type: "enum", enum: LANGS },
+  ] },
+  { resource: "sales_agent", singular: "SalesAgent", plural: "SalesAgents", label: "comercial", fields: [
+    { name: "nombre", type: "text", required: true },
+    { name: "email", type: "email", required: true },
+    { name: "destinos", type: "array" },
+    { name: "idiomas", type: "array" },
+    { name: "mercados", type: "array" },
+    { name: "zona_horaria", type: "text" },
+    { name: "activo", type: "boolean" },
+  ] },
+  { resource: "business_hours", singular: "BusinessHours", plural: "BusinessHoursList", label: "horario", fields: [
+    { name: "mercado", type: "text", required: true },
+    { name: "zona_horaria", type: "text", required: true },
+    { name: "horario", type: "object", required: true },
+    { name: "festivos", type: "array" },
+  ] },
+  { resource: "booking", singular: "Booking", plural: "Bookings", label: "reserva", fields: [
+    { name: "codigo", type: "text", required: true },
+    { name: "contact_id", type: "uuid" },
+    { name: "viajero_nombre", type: "text", required: true },
+    { name: "viajero_telefono", type: "text", pattern: PHONE },
+    { name: "viajero_email", type: "email" },
+    { name: "destino", type: "text", required: true },
+    { name: "inicio", type: "datetime", required: true },
+    { name: "fin", type: "datetime", required: true },
+    { name: "servicios", type: "array" },
+  ] },
+  { resource: "incident", singular: "Incident", plural: "Incidents", label: "incidencia", fields: [
+    { name: "booking_id", type: "uuid", required: true },
+    { name: "conversation_id", type: "uuid" },
+    { name: "tipologia", type: "enum", enum: ["traslado_no_presentado", "consulta", "otra"] },
+    { name: "urgencia", type: "enum", enum: URGENCY },
+    { name: "estado", type: "enum", enum: ["identificando", "bienvenida", "clasificando", "protocolo", "conversacional", "escalado", "seguimiento", "cerrado"] },
+    { name: "protocol_id", type: "uuid" },
+    { name: "escalado_a", type: "text" },
+    { name: "sla_vence", type: "datetime" },
+    { name: "feedback", type: "longtext" },
+  ] },
+  { resource: "incident_action", singular: "IncidentAction", plural: "IncidentActions", label: "acción", fields: [
+    { name: "incident_id", type: "uuid", required: true },
+    { name: "tipo", type: "enum", enum: ["mensaje_viajero", "mensaje_proveedor", "espera", "decision", "autorizacion", "escalado", "resultado"], required: true },
+    { name: "detalle", type: "object" },
+    { name: "monto", type: "money" },
+  ] },
+  { resource: "protocol", singular: "Protocol", plural: "Protocols", label: "protocolo", fields: [
+    { name: "codigo", type: "text", required: true },
+    { name: "nombre", type: "text", required: true },
+    { name: "version", type: "integer", required: true, min: 1 },
+    { name: "activo", type: "boolean" },
+    { name: "definicion", type: "object", required: true },
+    { name: "tope_autorizado", type: "money" },
+  ] },
+  { resource: "kb_article", singular: "KbArticle", plural: "KbArticles", label: "artículo", fields: [
+    { name: "titulo", type: "text", required: true },
+    { name: "contenido", type: "longtext", required: true },
+    { name: "idioma", type: "enum", enum: LANGS },
+    { name: "etiquetas", type: "array" },
+  ] },
+  { resource: "kpi_event", singular: "KpiEvent", plural: "KpiEvents", label: "evento KPI", fields: [
+    { name: "tipo", type: "text", required: true },
+    { name: "agente", type: "enum", enum: AGENTS },
+    { name: "canal", type: "enum", enum: CHANNELS },
+    { name: "valor", type: "number" },
+    { name: "ref_id", type: "uuid" },
+    { name: "datos", type: "object" },
+  ] },
+];

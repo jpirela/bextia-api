@@ -1,0 +1,1149 @@
+{
+  "version": "1",
+  "project": {
+    "name": "bextia-agentes",
+    "root": "."
+  },
+  "discovery": [],
+  "mode": "crear-e-integrar",
+  "outputs": {
+    "selected": [
+      "api"
+    ]
+  },
+  "deploy": {
+    "target": "render"
+  },
+  "functionalities": [
+    {
+      "id": "listContacts",
+      "name": "Listar contacto",
+      "kind": "query",
+      "resource": "contact",
+      "fields": [
+        {
+          "name": "nombre",
+          "type": "text"
+        },
+        {
+          "name": "telefono",
+          "type": "text",
+          "pattern": "^+?[0-9]{7,15}$"
+        },
+        {
+          "name": "email",
+          "type": "email"
+        },
+        {
+          "name": "idioma",
+          "type": "enum",
+          "enum": [
+            "es",
+            "en",
+            "pt",
+            "fr",
+            "it",
+            "de"
+          ]
+        },
+        {
+          "name": "mercado",
+          "type": "text"
+        },
+        {
+          "name": "canal_preferido",
+          "type": "enum",
+          "enum": [
+            "whatsapp",
+            "email",
+            "web",
+            "form",
+            "sim"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "createContact",
+      "name": "Crear contacto",
+      "kind": "mutation",
+      "resource": "contact",
+      "fields": [
+        {
+          "name": "nombre",
+          "type": "text"
+        },
+        {
+          "name": "telefono",
+          "type": "text",
+          "pattern": "^+?[0-9]{7,15}$"
+        },
+        {
+          "name": "email",
+          "type": "email"
+        },
+        {
+          "name": "idioma",
+          "type": "enum",
+          "enum": [
+            "es",
+            "en",
+            "pt",
+            "fr",
+            "it",
+            "de"
+          ]
+        },
+        {
+          "name": "mercado",
+          "type": "text"
+        },
+        {
+          "name": "canal_preferido",
+          "type": "enum",
+          "enum": [
+            "whatsapp",
+            "email",
+            "web",
+            "form",
+            "sim"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "listConversations",
+      "name": "Listar conversación",
+      "kind": "query",
+      "resource": "conversation",
+      "fields": [
+        {
+          "name": "contact_id",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "canal",
+          "type": "enum",
+          "enum": [
+            "whatsapp",
+            "email",
+            "web",
+            "form",
+            "sim"
+          ],
+          "required": true
+        },
+        {
+          "name": "agente",
+          "type": "enum",
+          "enum": [
+            "leads",
+            "incidents"
+          ]
+        },
+        {
+          "name": "estado",
+          "type": "enum",
+          "enum": [
+            "abierta",
+            "cerrada"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "createConversation",
+      "name": "Crear conversación",
+      "kind": "mutation",
+      "resource": "conversation",
+      "fields": [
+        {
+          "name": "contact_id",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "canal",
+          "type": "enum",
+          "enum": [
+            "whatsapp",
+            "email",
+            "web",
+            "form",
+            "sim"
+          ],
+          "required": true
+        },
+        {
+          "name": "agente",
+          "type": "enum",
+          "enum": [
+            "leads",
+            "incidents"
+          ]
+        },
+        {
+          "name": "estado",
+          "type": "enum",
+          "enum": [
+            "abierta",
+            "cerrada"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "listMessages",
+      "name": "Listar mensaje",
+      "kind": "query",
+      "resource": "message",
+      "fields": [
+        {
+          "name": "conversation_id",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "canal",
+          "type": "enum",
+          "enum": [
+            "whatsapp",
+            "email",
+            "web",
+            "form",
+            "sim"
+          ],
+          "required": true
+        },
+        {
+          "name": "direccion",
+          "type": "enum",
+          "enum": [
+            "in",
+            "out"
+          ],
+          "required": true
+        },
+        {
+          "name": "contenido",
+          "type": "longtext",
+          "required": true
+        },
+        {
+          "name": "external_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "agente",
+          "type": "enum",
+          "enum": [
+            "leads",
+            "incidents"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "createMessage",
+      "name": "Crear mensaje",
+      "kind": "mutation",
+      "resource": "message",
+      "fields": [
+        {
+          "name": "conversation_id",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "canal",
+          "type": "enum",
+          "enum": [
+            "whatsapp",
+            "email",
+            "web",
+            "form",
+            "sim"
+          ],
+          "required": true
+        },
+        {
+          "name": "direccion",
+          "type": "enum",
+          "enum": [
+            "in",
+            "out"
+          ],
+          "required": true
+        },
+        {
+          "name": "contenido",
+          "type": "longtext",
+          "required": true
+        },
+        {
+          "name": "external_id",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "agente",
+          "type": "enum",
+          "enum": [
+            "leads",
+            "incidents"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "listLeads",
+      "name": "Listar lead",
+      "kind": "query",
+      "resource": "lead",
+      "fields": [
+        {
+          "name": "contact_id",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "destino",
+          "type": "text"
+        },
+        {
+          "name": "fecha_inicio",
+          "type": "date"
+        },
+        {
+          "name": "fecha_fin",
+          "type": "date"
+        },
+        {
+          "name": "viajeros",
+          "type": "integer",
+          "min": 1
+        },
+        {
+          "name": "interes",
+          "type": "text"
+        },
+        {
+          "name": "urgencia",
+          "type": "enum",
+          "enum": [
+            "baja",
+            "media",
+            "alta"
+          ]
+        },
+        {
+          "name": "score",
+          "type": "integer",
+          "min": 0,
+          "max": 100
+        },
+        {
+          "name": "estado",
+          "type": "enum",
+          "enum": [
+            "nuevo",
+            "respondido",
+            "cualificando",
+            "cualificado",
+            "asignado",
+            "entregado"
+          ]
+        },
+        {
+          "name": "sales_agent_id",
+          "type": "uuid"
+        },
+        {
+          "name": "resumen_ia",
+          "type": "longtext"
+        },
+        {
+          "name": "fuera_de_horario",
+          "type": "boolean"
+        },
+        {
+          "name": "mercado",
+          "type": "text"
+        },
+        {
+          "name": "idioma",
+          "type": "enum",
+          "enum": [
+            "es",
+            "en",
+            "pt",
+            "fr",
+            "it",
+            "de"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "createLead",
+      "name": "Crear lead",
+      "kind": "mutation",
+      "resource": "lead",
+      "fields": [
+        {
+          "name": "contact_id",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "destino",
+          "type": "text"
+        },
+        {
+          "name": "fecha_inicio",
+          "type": "date"
+        },
+        {
+          "name": "fecha_fin",
+          "type": "date"
+        },
+        {
+          "name": "viajeros",
+          "type": "integer",
+          "min": 1
+        },
+        {
+          "name": "interes",
+          "type": "text"
+        },
+        {
+          "name": "urgencia",
+          "type": "enum",
+          "enum": [
+            "baja",
+            "media",
+            "alta"
+          ]
+        },
+        {
+          "name": "score",
+          "type": "integer",
+          "min": 0,
+          "max": 100
+        },
+        {
+          "name": "estado",
+          "type": "enum",
+          "enum": [
+            "nuevo",
+            "respondido",
+            "cualificando",
+            "cualificado",
+            "asignado",
+            "entregado"
+          ]
+        },
+        {
+          "name": "sales_agent_id",
+          "type": "uuid"
+        },
+        {
+          "name": "resumen_ia",
+          "type": "longtext"
+        },
+        {
+          "name": "fuera_de_horario",
+          "type": "boolean"
+        },
+        {
+          "name": "mercado",
+          "type": "text"
+        },
+        {
+          "name": "idioma",
+          "type": "enum",
+          "enum": [
+            "es",
+            "en",
+            "pt",
+            "fr",
+            "it",
+            "de"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "listSalesAgents",
+      "name": "Listar comercial",
+      "kind": "query",
+      "resource": "sales_agent",
+      "fields": [
+        {
+          "name": "nombre",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "email",
+          "type": "email",
+          "required": true
+        },
+        {
+          "name": "destinos",
+          "type": "array"
+        },
+        {
+          "name": "idiomas",
+          "type": "array"
+        },
+        {
+          "name": "mercados",
+          "type": "array"
+        },
+        {
+          "name": "zona_horaria",
+          "type": "text"
+        },
+        {
+          "name": "activo",
+          "type": "boolean"
+        }
+      ]
+    },
+    {
+      "id": "createSalesAgent",
+      "name": "Crear comercial",
+      "kind": "mutation",
+      "resource": "sales_agent",
+      "fields": [
+        {
+          "name": "nombre",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "email",
+          "type": "email",
+          "required": true
+        },
+        {
+          "name": "destinos",
+          "type": "array"
+        },
+        {
+          "name": "idiomas",
+          "type": "array"
+        },
+        {
+          "name": "mercados",
+          "type": "array"
+        },
+        {
+          "name": "zona_horaria",
+          "type": "text"
+        },
+        {
+          "name": "activo",
+          "type": "boolean"
+        }
+      ]
+    },
+    {
+      "id": "listBusinessHoursList",
+      "name": "Listar horario",
+      "kind": "query",
+      "resource": "business_hours",
+      "fields": [
+        {
+          "name": "mercado",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "zona_horaria",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "horario",
+          "type": "object",
+          "required": true
+        },
+        {
+          "name": "festivos",
+          "type": "array"
+        }
+      ]
+    },
+    {
+      "id": "createBusinessHours",
+      "name": "Crear horario",
+      "kind": "mutation",
+      "resource": "business_hours",
+      "fields": [
+        {
+          "name": "mercado",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "zona_horaria",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "horario",
+          "type": "object",
+          "required": true
+        },
+        {
+          "name": "festivos",
+          "type": "array"
+        }
+      ]
+    },
+    {
+      "id": "listBookings",
+      "name": "Listar reserva",
+      "kind": "query",
+      "resource": "booking",
+      "fields": [
+        {
+          "name": "codigo",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "contact_id",
+          "type": "uuid"
+        },
+        {
+          "name": "viajero_nombre",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "viajero_telefono",
+          "type": "text",
+          "pattern": "^+?[0-9]{7,15}$"
+        },
+        {
+          "name": "viajero_email",
+          "type": "email"
+        },
+        {
+          "name": "destino",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "inicio",
+          "type": "datetime",
+          "required": true
+        },
+        {
+          "name": "fin",
+          "type": "datetime",
+          "required": true
+        },
+        {
+          "name": "servicios",
+          "type": "array"
+        }
+      ]
+    },
+    {
+      "id": "createBooking",
+      "name": "Crear reserva",
+      "kind": "mutation",
+      "resource": "booking",
+      "fields": [
+        {
+          "name": "codigo",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "contact_id",
+          "type": "uuid"
+        },
+        {
+          "name": "viajero_nombre",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "viajero_telefono",
+          "type": "text",
+          "pattern": "^+?[0-9]{7,15}$"
+        },
+        {
+          "name": "viajero_email",
+          "type": "email"
+        },
+        {
+          "name": "destino",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "inicio",
+          "type": "datetime",
+          "required": true
+        },
+        {
+          "name": "fin",
+          "type": "datetime",
+          "required": true
+        },
+        {
+          "name": "servicios",
+          "type": "array"
+        }
+      ]
+    },
+    {
+      "id": "listIncidents",
+      "name": "Listar incidencia",
+      "kind": "query",
+      "resource": "incident",
+      "fields": [
+        {
+          "name": "booking_id",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "conversation_id",
+          "type": "uuid"
+        },
+        {
+          "name": "tipologia",
+          "type": "enum",
+          "enum": [
+            "traslado_no_presentado",
+            "consulta",
+            "otra"
+          ]
+        },
+        {
+          "name": "urgencia",
+          "type": "enum",
+          "enum": [
+            "baja",
+            "media",
+            "alta"
+          ]
+        },
+        {
+          "name": "estado",
+          "type": "enum",
+          "enum": [
+            "identificando",
+            "bienvenida",
+            "clasificando",
+            "protocolo",
+            "conversacional",
+            "escalado",
+            "seguimiento",
+            "cerrado"
+          ]
+        },
+        {
+          "name": "protocol_id",
+          "type": "uuid"
+        },
+        {
+          "name": "escalado_a",
+          "type": "text"
+        },
+        {
+          "name": "sla_vence",
+          "type": "datetime"
+        },
+        {
+          "name": "feedback",
+          "type": "longtext"
+        }
+      ]
+    },
+    {
+      "id": "createIncident",
+      "name": "Crear incidencia",
+      "kind": "mutation",
+      "resource": "incident",
+      "fields": [
+        {
+          "name": "booking_id",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "conversation_id",
+          "type": "uuid"
+        },
+        {
+          "name": "tipologia",
+          "type": "enum",
+          "enum": [
+            "traslado_no_presentado",
+            "consulta",
+            "otra"
+          ]
+        },
+        {
+          "name": "urgencia",
+          "type": "enum",
+          "enum": [
+            "baja",
+            "media",
+            "alta"
+          ]
+        },
+        {
+          "name": "estado",
+          "type": "enum",
+          "enum": [
+            "identificando",
+            "bienvenida",
+            "clasificando",
+            "protocolo",
+            "conversacional",
+            "escalado",
+            "seguimiento",
+            "cerrado"
+          ]
+        },
+        {
+          "name": "protocol_id",
+          "type": "uuid"
+        },
+        {
+          "name": "escalado_a",
+          "type": "text"
+        },
+        {
+          "name": "sla_vence",
+          "type": "datetime"
+        },
+        {
+          "name": "feedback",
+          "type": "longtext"
+        }
+      ]
+    },
+    {
+      "id": "listIncidentActions",
+      "name": "Listar acción",
+      "kind": "query",
+      "resource": "incident_action",
+      "fields": [
+        {
+          "name": "incident_id",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "tipo",
+          "type": "enum",
+          "enum": [
+            "mensaje_viajero",
+            "mensaje_proveedor",
+            "espera",
+            "decision",
+            "autorizacion",
+            "escalado",
+            "resultado"
+          ],
+          "required": true
+        },
+        {
+          "name": "detalle",
+          "type": "object"
+        },
+        {
+          "name": "monto",
+          "type": "money"
+        }
+      ]
+    },
+    {
+      "id": "createIncidentAction",
+      "name": "Crear acción",
+      "kind": "mutation",
+      "resource": "incident_action",
+      "fields": [
+        {
+          "name": "incident_id",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "tipo",
+          "type": "enum",
+          "enum": [
+            "mensaje_viajero",
+            "mensaje_proveedor",
+            "espera",
+            "decision",
+            "autorizacion",
+            "escalado",
+            "resultado"
+          ],
+          "required": true
+        },
+        {
+          "name": "detalle",
+          "type": "object"
+        },
+        {
+          "name": "monto",
+          "type": "money"
+        }
+      ]
+    },
+    {
+      "id": "listProtocols",
+      "name": "Listar protocolo",
+      "kind": "query",
+      "resource": "protocol",
+      "fields": [
+        {
+          "name": "codigo",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "nombre",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "required": true,
+          "min": 1
+        },
+        {
+          "name": "activo",
+          "type": "boolean"
+        },
+        {
+          "name": "definicion",
+          "type": "object",
+          "required": true
+        },
+        {
+          "name": "tope_autorizado",
+          "type": "money"
+        }
+      ]
+    },
+    {
+      "id": "createProtocol",
+      "name": "Crear protocolo",
+      "kind": "mutation",
+      "resource": "protocol",
+      "fields": [
+        {
+          "name": "codigo",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "nombre",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "required": true,
+          "min": 1
+        },
+        {
+          "name": "activo",
+          "type": "boolean"
+        },
+        {
+          "name": "definicion",
+          "type": "object",
+          "required": true
+        },
+        {
+          "name": "tope_autorizado",
+          "type": "money"
+        }
+      ]
+    },
+    {
+      "id": "listKbArticles",
+      "name": "Listar artículo",
+      "kind": "query",
+      "resource": "kb_article",
+      "fields": [
+        {
+          "name": "titulo",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "contenido",
+          "type": "longtext",
+          "required": true
+        },
+        {
+          "name": "idioma",
+          "type": "enum",
+          "enum": [
+            "es",
+            "en",
+            "pt",
+            "fr",
+            "it",
+            "de"
+          ]
+        },
+        {
+          "name": "etiquetas",
+          "type": "array"
+        }
+      ]
+    },
+    {
+      "id": "createKbArticle",
+      "name": "Crear artículo",
+      "kind": "mutation",
+      "resource": "kb_article",
+      "fields": [
+        {
+          "name": "titulo",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "contenido",
+          "type": "longtext",
+          "required": true
+        },
+        {
+          "name": "idioma",
+          "type": "enum",
+          "enum": [
+            "es",
+            "en",
+            "pt",
+            "fr",
+            "it",
+            "de"
+          ]
+        },
+        {
+          "name": "etiquetas",
+          "type": "array"
+        }
+      ]
+    },
+    {
+      "id": "listKpiEvents",
+      "name": "Listar evento KPI",
+      "kind": "query",
+      "resource": "kpi_event",
+      "fields": [
+        {
+          "name": "tipo",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "agente",
+          "type": "enum",
+          "enum": [
+            "leads",
+            "incidents"
+          ]
+        },
+        {
+          "name": "canal",
+          "type": "enum",
+          "enum": [
+            "whatsapp",
+            "email",
+            "web",
+            "form",
+            "sim"
+          ]
+        },
+        {
+          "name": "valor",
+          "type": "number"
+        },
+        {
+          "name": "ref_id",
+          "type": "uuid"
+        },
+        {
+          "name": "datos",
+          "type": "object"
+        }
+      ]
+    },
+    {
+      "id": "createKpiEvent",
+      "name": "Crear evento KPI",
+      "kind": "mutation",
+      "resource": "kpi_event",
+      "fields": [
+        {
+          "name": "tipo",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "agente",
+          "type": "enum",
+          "enum": [
+            "leads",
+            "incidents"
+          ]
+        },
+        {
+          "name": "canal",
+          "type": "enum",
+          "enum": [
+            "whatsapp",
+            "email",
+            "web",
+            "form",
+            "sim"
+          ]
+        },
+        {
+          "name": "valor",
+          "type": "number"
+        },
+        {
+          "name": "ref_id",
+          "type": "uuid"
+        },
+        {
+          "name": "datos",
+          "type": "object"
+        }
+      ]
+    }
+  ],
+  "demo": {
+    "path": "apps/backoffice"
+  },
+  "persistence": {
+    "engine": "supabase",
+    "secretRef": "DATABASE_URL"
+  },
+  "sources": {
+    "databases": []
+  }
+}
