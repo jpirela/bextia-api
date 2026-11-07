@@ -1,129 +1,155 @@
-// Generado por jor-cli — schema Postgres (Drizzle), derivado de las funcionalidades.
-import { boolean, date, integer, jsonb, numeric, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+// Mantenido a mano (jor-cli build lo conserva). Columnas = campos de contract/resources.mjs + auditoría.
+import {
+  boolean, date, doublePrecision, integer, jsonb, numeric, pgTable, text, timestamp, unique, uuid, vector,
+} from "drizzle-orm/pg-core";
 
-export const booking = pgTable("booking", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  codigo: text("codigo").notNull(),
-  contactId: uuid("contact_id"),
-  viajeroNombre: text("viajero_nombre").notNull(),
-  viajeroTelefono: text("viajero_telefono"),
-  viajeroEmail: text("viajero_email"),
-  destino: text("destino").notNull(),
-  inicio: timestamp("inicio").notNull(),
-  fin: timestamp("fin").notNull(),
-  servicios: jsonb("servicios"),
-});
+export type Channel = "whatsapp" | "email" | "web" | "form" | "sim";
+export type AgentName = "leads" | "incidents";
+export type Weekday = "mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun";
+export type WeeklyHours = Partial<Record<Weekday, Array<[string, string]>>>;
 
-export const businessHours = pgTable("business_hours", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  mercado: text("mercado").notNull(),
-  zonaHoraria: text("zona_horaria").notNull(),
-  horario: jsonb("horario").notNull(),
-  festivos: jsonb("festivos"),
-});
+const id = () => uuid("id").primaryKey().defaultRandom();
+const createdAt = () => timestamp("created_at", { withTimezone: true }).notNull().defaultNow();
 
 export const contact = pgTable("contact", {
-  id: uuid("id").primaryKey().defaultRandom(),
+  id: id(),
   nombre: text("nombre"),
-  telefono: text("telefono"),
-  email: text("email"),
+  telefono: text("telefono").unique(),
+  email: text("email").unique(),
   idioma: text("idioma"),
   mercado: text("mercado"),
-  canalPreferido: text("canal_preferido"),
+  canal_preferido: text("canal_preferido").$type<Channel>(),
+  created_at: createdAt(),
 });
 
 export const conversation = pgTable("conversation", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  contactId: uuid("contact_id").notNull(),
-  canal: text("canal").notNull(),
-  agente: text("agente"),
-  estado: text("estado"),
-});
-
-export const incident = pgTable("incident", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  bookingId: uuid("booking_id").notNull(),
-  conversationId: uuid("conversation_id"),
-  tipologia: text("tipologia"),
-  urgencia: text("urgencia"),
-  estado: text("estado"),
-  protocolId: uuid("protocol_id"),
-  escaladoA: text("escalado_a"),
-  slaVence: timestamp("sla_vence"),
-  feedback: text("feedback"),
-});
-
-export const incidentAction = pgTable("incident_action", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  incidentId: uuid("incident_id").notNull(),
-  tipo: text("tipo").notNull(),
-  detalle: jsonb("detalle"),
-  monto: numeric("monto"),
-});
-
-export const kbArticle = pgTable("kb_article", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  titulo: text("titulo").notNull(),
-  contenido: text("contenido").notNull(),
-  idioma: text("idioma"),
-  etiquetas: jsonb("etiquetas"),
-});
-
-export const kpiEvent = pgTable("kpi_event", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  tipo: text("tipo").notNull(),
-  agente: text("agente"),
-  canal: text("canal"),
-  valor: numeric("valor"),
-  refId: uuid("ref_id"),
-  datos: jsonb("datos"),
-});
-
-export const lead = pgTable("lead", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  contactId: uuid("contact_id").notNull(),
-  destino: text("destino"),
-  fechaInicio: date("fecha_inicio"),
-  fechaFin: date("fecha_fin"),
-  viajeros: integer("viajeros"),
-  interes: text("interes"),
-  urgencia: text("urgencia"),
-  score: integer("score"),
-  estado: text("estado"),
-  salesAgentId: uuid("sales_agent_id"),
-  resumenIa: text("resumen_ia"),
-  fueraDeHorario: boolean("fuera_de_horario"),
-  mercado: text("mercado"),
-  idioma: text("idioma"),
+  id: id(),
+  contact_id: uuid("contact_id").notNull().references(() => contact.id),
+  canal: text("canal").$type<Channel>().notNull(),
+  agente: text("agente").$type<AgentName>(),
+  estado: text("estado").$type<"abierta" | "cerrada">().notNull().default("abierta"),
+  created_at: createdAt(),
 });
 
 export const message = pgTable("message", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  conversationId: uuid("conversation_id").notNull(),
-  canal: text("canal").notNull(),
-  direccion: text("direccion").notNull(),
+  id: id(),
+  conversation_id: uuid("conversation_id").notNull().references(() => conversation.id),
+  canal: text("canal").$type<Channel>().notNull(),
+  direccion: text("direccion").$type<"in" | "out">().notNull(),
   contenido: text("contenido").notNull(),
-  externalId: text("external_id").notNull(),
-  agente: text("agente"),
+  external_id: text("external_id").notNull(),
+  agente: text("agente").$type<AgentName>(),
+  created_at: createdAt(),
+}, (t) => [unique("message_canal_external_id").on(t.canal, t.external_id)]);
+
+export const sales_agent = pgTable("sales_agent", {
+  id: id(),
+  nombre: text("nombre").notNull(),
+  email: text("email").notNull().unique(),
+  destinos: text("destinos").array().notNull().default([]),
+  idiomas: text("idiomas").array().notNull().default([]),
+  mercados: text("mercados").array().notNull().default([]),
+  zona_horaria: text("zona_horaria"),
+  activo: boolean("activo").notNull().default(true),
+  created_at: createdAt(),
+});
+
+export const lead = pgTable("lead", {
+  id: id(),
+  contact_id: uuid("contact_id").notNull().references(() => contact.id),
+  conversation_id: uuid("conversation_id").references(() => conversation.id),
+  destino: text("destino"),
+  fecha_inicio: date("fecha_inicio"),
+  fecha_fin: date("fecha_fin"),
+  viajeros: integer("viajeros"),
+  interes: text("interes"),
+  urgencia: text("urgencia").$type<"baja" | "media" | "alta">(),
+  score: integer("score"),
+  estado: text("estado").notNull().default("nuevo"),
+  sales_agent_id: uuid("sales_agent_id").references(() => sales_agent.id),
+  resumen_ia: text("resumen_ia"),
+  fuera_de_horario: boolean("fuera_de_horario").notNull().default(false),
+  mercado: text("mercado"),
+  idioma: text("idioma"),
+  entregado_at: timestamp("entregado_at", { withTimezone: true }),
+  created_at: createdAt(),
+});
+
+export const business_hours = pgTable("business_hours", {
+  id: id(),
+  mercado: text("mercado").notNull().unique(),
+  zona_horaria: text("zona_horaria").notNull(),
+  horario: jsonb("horario").$type<WeeklyHours>().notNull(),
+  festivos: text("festivos").array().notNull().default([]),
+});
+
+export const booking = pgTable("booking", {
+  id: id(),
+  codigo: text("codigo").notNull().unique(),
+  contact_id: uuid("contact_id").references(() => contact.id),
+  viajero_nombre: text("viajero_nombre").notNull(),
+  viajero_telefono: text("viajero_telefono"),
+  viajero_email: text("viajero_email"),
+  destino: text("destino").notNull(),
+  inicio: timestamp("inicio", { withTimezone: true }).notNull(),
+  fin: timestamp("fin", { withTimezone: true }).notNull(),
+  servicios: jsonb("servicios").$type<Array<Record<string, unknown>>>().notNull().default([]),
+  created_at: createdAt(),
 });
 
 export const protocol = pgTable("protocol", {
-  id: uuid("id").primaryKey().defaultRandom(),
+  id: id(),
   codigo: text("codigo").notNull(),
   nombre: text("nombre").notNull(),
   version: integer("version").notNull(),
-  activo: boolean("activo"),
-  definicion: jsonb("definicion").notNull(),
-  topeAutorizado: numeric("tope_autorizado"),
+  activo: boolean("activo").notNull().default(true),
+  definicion: jsonb("definicion").$type<Record<string, unknown>>().notNull(),
+  tope_autorizado: numeric("tope_autorizado", { precision: 12, scale: 2 }),
+  created_at: createdAt(),
+}, (t) => [unique("protocol_codigo_version").on(t.codigo, t.version)]);
+
+export const incident = pgTable("incident", {
+  id: id(),
+  booking_id: uuid("booking_id").notNull().references(() => booking.id),
+  conversation_id: uuid("conversation_id").references(() => conversation.id),
+  tipologia: text("tipologia"),
+  urgencia: text("urgencia"),
+  estado: text("estado").notNull().default("identificando"),
+  protocol_id: uuid("protocol_id").references(() => protocol.id),
+  escalado_a: text("escalado_a"),
+  sla_vence: timestamp("sla_vence", { withTimezone: true }),
+  feedback: text("feedback"),
+  created_at: createdAt(),
+  cerrado_at: timestamp("cerrado_at", { withTimezone: true }),
 });
 
-export const salesAgent = pgTable("sales_agent", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  nombre: text("nombre").notNull(),
-  email: text("email").notNull(),
-  destinos: jsonb("destinos"),
-  idiomas: jsonb("idiomas"),
-  mercados: jsonb("mercados"),
-  zonaHoraria: text("zona_horaria"),
-  activo: boolean("activo"),
+export const incident_action = pgTable("incident_action", {
+  id: id(),
+  incident_id: uuid("incident_id").notNull().references(() => incident.id),
+  tipo: text("tipo").notNull(),
+  detalle: jsonb("detalle").$type<Record<string, unknown>>().notNull().default({}),
+  monto: numeric("monto", { precision: 12, scale: 2 }),
+  created_at: createdAt(),
+});
+
+export const kb_article = pgTable("kb_article", {
+  id: id(),
+  titulo: text("titulo").notNull(),
+  contenido: text("contenido").notNull(),
+  idioma: text("idioma").notNull().default("es"),
+  etiquetas: text("etiquetas").array().notNull().default([]),
+  // proveedor de embeddings: se decide en el subproyecto 2 (dimensión 1024)
+  embedding: vector("embedding", { dimensions: 1024 }),
+  created_at: createdAt(),
+});
+
+export const kpi_event = pgTable("kpi_event", {
+  id: id(),
+  tipo: text("tipo").notNull(),
+  agente: text("agente").$type<AgentName>(),
+  canal: text("canal").$type<Channel>(),
+  valor: doublePrecision("valor"),
+  ref_id: uuid("ref_id"),
+  datos: jsonb("datos").$type<Record<string, unknown>>().notNull().default({}),
+  created_at: createdAt(),
 });
