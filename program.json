@@ -1,0 +1,20 @@
+{
+  "name": "bextia-agentes",
+  "archetype": "backoffice",
+  "stage": "descubrimiento",
+  "status": "demo",
+  "provenance": [
+    {
+      "from": "documentacion\\Alcance Funcional y Tecnico Proveedor_Implantador_BEXTIA.pdf",
+      "bucket": "docs",
+      "at": "2026-11-07T20:39:23.353Z"
+    },
+    {
+      "from": "documentacion\\Correo.pdf",
+      "bucket": "discovery/emails",
+      "at": "2026-11-07T20:39:23.353Z"
+    }
+  ],
+  "modelDecisions": [],
+  "origen": "demo"
+}
