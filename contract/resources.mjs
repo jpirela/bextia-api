@@ -3,6 +3,7 @@ export const CHANNELS = ["whatsapp", "email", "web", "form", "sim"];
 const LANGS = ["es", "en", "pt", "fr", "it", "de"];
 const URGENCY = ["baja", "media", "alta"];
 const AGENTS = ["leads", "incidents"];
+const LEAD_TYPES = ["vacacional", "luna_de_miel", "grupo", "corporativo", "otro"];
 const PHONE = "^\\+?[0-9]{7,15}$";
 
 export const resources = [
@@ -43,6 +44,7 @@ export const resources = [
     { name: "fuera_de_horario", type: "boolean" },
     { name: "mercado", type: "text" },
     { name: "idioma", type: "enum", enum: LANGS },
+    { name: "tipo", type: "enum", enum: LEAD_TYPES }, { name: "requiere_humano", type: "boolean" },
   ] },
   { resource: "sales_agent", singular: "SalesAgent", plural: "SalesAgents", label: "comercial", fields: [
     { name: "nombre", type: "text", required: true },
@@ -50,6 +52,7 @@ export const resources = [
     { name: "destinos", type: "array" },
     { name: "idiomas", type: "array" },
     { name: "mercados", type: "array" },
+    { name: "tipos_lead", type: "array" },
     { name: "zona_horaria", type: "text" },
     { name: "activo", type: "boolean" },
   ] },

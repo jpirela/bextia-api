@@ -383,6 +383,21 @@
             "it",
             "de"
           ]
+        },
+        {
+          "name": "tipo",
+          "type": "enum",
+          "enum": [
+            "vacacional",
+            "luna_de_miel",
+            "grupo",
+            "corporativo",
+            "otro"
+          ]
+        },
+        {
+          "name": "requiere_humano",
+          "type": "boolean"
         }
       ]
     },
@@ -472,6 +487,21 @@
             "it",
             "de"
           ]
+        },
+        {
+          "name": "tipo",
+          "type": "enum",
+          "enum": [
+            "vacacional",
+            "luna_de_miel",
+            "grupo",
+            "corporativo",
+            "otro"
+          ]
+        },
+        {
+          "name": "requiere_humano",
+          "type": "boolean"
         }
       ]
     },
@@ -501,6 +531,10 @@
         },
         {
           "name": "mercados",
+          "type": "array"
+        },
+        {
+          "name": "tipos_lead",
           "type": "array"
         },
         {
@@ -539,6 +573,10 @@
         },
         {
           "name": "mercados",
+          "type": "array"
+        },
+        {
+          "name": "tipos_lead",
           "type": "array"
         },
         {

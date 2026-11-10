@@ -1,12 +1,17 @@
 // Mantenido a mano (jor-cli build lo conserva). Columnas = campos de contract/resources.mjs + auditoría.
+import { sql } from "drizzle-orm";
 import {
-  boolean, date, doublePrecision, integer, jsonb, numeric, pgTable, text, timestamp, unique, uuid, vector,
+  boolean, date, doublePrecision, integer, jsonb, numeric, pgTable, text, timestamp, unique, uniqueIndex, uuid, vector,
 } from "drizzle-orm/pg-core";
 
 export type Channel = "whatsapp" | "email" | "web" | "form" | "sim";
 export type AgentName = "leads" | "incidents";
 export type Weekday = "mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun";
 export type WeeklyHours = Partial<Record<Weekday, Array<[string, string]>>>;
+export type Urgency = "baja" | "media" | "alta";
+export type Lang = "es" | "en" | "pt" | "fr" | "it" | "de";
+export type LeadState = "nuevo" | "respondido" | "cualificando" | "cualificado" | "asignado" | "entregado";
+export type LeadType = "vacacional" | "luna_de_miel" | "grupo" | "corporativo" | "otro";
 
 const id = () => uuid("id").primaryKey().defaultRandom();
 const createdAt = () => timestamp("created_at", { withTimezone: true }).notNull().defaultNow();
@@ -29,7 +34,9 @@ export const conversation = pgTable("conversation", {
   agente: text("agente").$type<AgentName>(),
   estado: text("estado").$type<"abierta" | "cerrada">().notNull().default("abierta"),
   created_at: createdAt(),
-});
+}, (t) => [
+  uniqueIndex("conversation_abierta_unica").on(t.contact_id, t.canal).where(sql`estado = 'abierta'`),
+]);
 
 export const message = pgTable("message", {
   id: id(),
@@ -49,6 +56,7 @@ export const sales_agent = pgTable("sales_agent", {
   destinos: text("destinos").array().notNull().default([]),
   idiomas: text("idiomas").array().notNull().default([]),
   mercados: text("mercados").array().notNull().default([]),
+  tipos_lead: text("tipos_lead").array().notNull().default([]),
   zona_horaria: text("zona_horaria"),
   activo: boolean("activo").notNull().default(true),
   created_at: createdAt(),
@@ -57,20 +65,22 @@ export const sales_agent = pgTable("sales_agent", {
 export const lead = pgTable("lead", {
   id: id(),
   contact_id: uuid("contact_id").notNull().references(() => contact.id),
-  conversation_id: uuid("conversation_id").references(() => conversation.id),
+  conversation_id: uuid("conversation_id").references(() => conversation.id).unique(),
   destino: text("destino"),
   fecha_inicio: date("fecha_inicio"),
   fecha_fin: date("fecha_fin"),
   viajeros: integer("viajeros"),
   interes: text("interes"),
-  urgencia: text("urgencia").$type<"baja" | "media" | "alta">(),
+  urgencia: text("urgencia").$type<Urgency>(),
   score: integer("score"),
-  estado: text("estado").notNull().default("nuevo"),
+  estado: text("estado").$type<LeadState>().notNull().default("nuevo"),
   sales_agent_id: uuid("sales_agent_id").references(() => sales_agent.id),
   resumen_ia: text("resumen_ia"),
   fuera_de_horario: boolean("fuera_de_horario").notNull().default(false),
   mercado: text("mercado"),
   idioma: text("idioma"),
+  tipo: text("tipo").$type<LeadType>(),
+  requiere_humano: boolean("requiere_humano").notNull().default(false),
   entregado_at: timestamp("entregado_at", { withTimezone: true }),
   created_at: createdAt(),
 });
@@ -138,8 +148,8 @@ export const kb_article = pgTable("kb_article", {
   contenido: text("contenido").notNull(),
   idioma: text("idioma").notNull().default("es"),
   etiquetas: text("etiquetas").array().notNull().default([]),
-  // proveedor de embeddings: se decide en el subproyecto 2 (dimensión 1024)
-  embedding: vector("embedding", { dimensions: 1024 }),
+  // gte-small (Supabase Edge Function `embed`), 384 dimensiones
+  embedding: vector("embedding", { dimensions: 384 }),
   created_at: createdAt(),
 });
 
