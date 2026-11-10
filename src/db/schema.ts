@@ -1,7 +1,7 @@
 // Mantenido a mano (jor-cli build lo conserva). Columnas = campos de contract/resources.mjs + auditoría.
 import { sql } from "drizzle-orm";
 import {
-  boolean, date, doublePrecision, integer, jsonb, numeric, pgTable, text, timestamp, unique, uniqueIndex, uuid, vector,
+  boolean, date, doublePrecision, index, integer, jsonb, numeric, pgTable, text, timestamp, unique, uniqueIndex, uuid, vector,
 } from "drizzle-orm/pg-core";
 
 export type Channel = "whatsapp" | "email" | "web" | "form" | "sim";
@@ -12,6 +12,29 @@ export type Urgency = "baja" | "media" | "alta";
 export type Lang = "es" | "en" | "pt" | "fr" | "it" | "de";
 export type LeadState = "nuevo" | "respondido" | "cualificando" | "cualificado" | "asignado" | "entregado";
 export type LeadType = "vacacional" | "luna_de_miel" | "grupo" | "corporativo" | "otro";
+export type IncidentState =
+  | "identificando" | "bienvenida" | "clasificando" | "protocolo" | "conversacional" | "escalado" | "seguimiento" | "cerrado";
+export type IncidentType = "traslado_no_presentado" | "consulta" | "emergencia" | "otra";
+export type IncidentUrgency = "baja" | "media" | "alta" | "critica";
+export type IncidentActionType =
+  | "identificacion" | "mensaje_viajero" | "mensaje_proveedor" | "espera" | "decision" | "autorizacion" | "escalado" | "resultado" | "feedback";
+export interface BookingService {
+  tipo: "traslado" | "hotel" | "vuelo" | "otro";
+  proveedor: string;
+  telefono?: string;
+  email?: string;
+  inicio?: string; // ISO 8601
+  lugar?: string;
+  referencia?: string;
+}
+// Estado del intérprete de protocolos (src/protocols/engine.ts). espera_hasta en ISO 8601.
+export interface ProtocolState {
+  paso: string;
+  espera_hasta: string | null;
+  eta_min: number | null;
+  autorizado: number | null;
+  terminado: boolean;
+}
 
 const id = () => uuid("id").primaryKey().defaultRandom();
 const createdAt = () => timestamp("created_at", { withTimezone: true }).notNull().defaultNow();
@@ -103,7 +126,8 @@ export const booking = pgTable("booking", {
   destino: text("destino").notNull(),
   inicio: timestamp("inicio", { withTimezone: true }).notNull(),
   fin: timestamp("fin", { withTimezone: true }).notNull(),
-  servicios: jsonb("servicios").$type<Array<Record<string, unknown>>>().notNull().default([]),
+  servicios: jsonb("servicios").$type<BookingService[]>().notNull().default([]),
+  bienvenida_at: timestamp("bienvenida_at", { withTimezone: true }),
   created_at: createdAt(),
 });
 
@@ -115,6 +139,7 @@ export const protocol = pgTable("protocol", {
   activo: boolean("activo").notNull().default(true),
   definicion: jsonb("definicion").$type<Record<string, unknown>>().notNull(),
   tope_autorizado: numeric("tope_autorizado", { precision: 12, scale: 2 }),
+  moneda: text("moneda").notNull().default("EUR"),
   created_at: createdAt(),
 }, (t) => [unique("protocol_codigo_version").on(t.codigo, t.version)]);
 
@@ -122,21 +147,31 @@ export const incident = pgTable("incident", {
   id: id(),
   booking_id: uuid("booking_id").notNull().references(() => booking.id),
   conversation_id: uuid("conversation_id").references(() => conversation.id),
-  tipologia: text("tipologia"),
-  urgencia: text("urgencia"),
-  estado: text("estado").notNull().default("identificando"),
+  contact_id: uuid("contact_id").references(() => contact.id),
+  tipologia: text("tipologia").$type<IncidentType>(),
+  urgencia: text("urgencia").$type<IncidentUrgency>(),
+  estado: text("estado").$type<IncidentState>().notNull().default("identificando"),
   protocol_id: uuid("protocol_id").references(() => protocol.id),
+  protocolo_estado: jsonb("protocolo_estado").$type<ProtocolState | null>(),
+  proximo_paso_at: timestamp("proximo_paso_at", { withTimezone: true }),
+  proveedor_contacto: text("proveedor_contacto"),
+  intentos_identificacion: integer("intentos_identificacion").notNull().default(0),
+  requiere_humano: boolean("requiere_humano").notNull().default(false),
+  resumen_ia: text("resumen_ia"),
   escalado_a: text("escalado_a"),
   sla_vence: timestamp("sla_vence", { withTimezone: true }),
   feedback: text("feedback"),
   created_at: createdAt(),
   cerrado_at: timestamp("cerrado_at", { withTimezone: true }),
-});
-
+}, (t) => [
+  uniqueIndex("incident_abierta_por_conversacion").on(t.conversation_id).where(sql`estado <> 'cerrado'`),
+  index("incident_proveedor_contacto").on(t.proveedor_contacto),
+  index("incident_proximo_paso").on(t.proximo_paso_at),
+]);
 export const incident_action = pgTable("incident_action", {
   id: id(),
   incident_id: uuid("incident_id").notNull().references(() => incident.id),
-  tipo: text("tipo").notNull(),
+  tipo: text("tipo").$type<IncidentActionType>().notNull(),
   detalle: jsonb("detalle").$type<Record<string, unknown>>().notNull().default({}),
   monto: numeric("monto", { precision: 12, scale: 2 }),
   created_at: createdAt(),
@@ -163,3 +198,25 @@ export const kpi_event = pgTable("kpi_event", {
   datos: jsonb("datos").$type<Record<string, unknown>>().notNull().default({}),
   created_at: createdAt(),
 });
+
+// Guardia humana del Agente 2 (se escala al activo de menor prioridad).
+export const on_call = pgTable("on_call", {
+  id: id(),
+  nombre: text("nombre").notNull(),
+  email: text("email").notNull().unique(),
+  telefono: text("telefono"),
+  prioridad: integer("prioridad").notNull().default(1),
+  activo: boolean("activo").notNull().default(true),
+  created_at: createdAt(),
+});
+
+// Interna (no está en el contrato): códigos OTP del widget web, guardados como HMAC.
+export const web_otp = pgTable("web_otp", {
+  id: id(),
+  destino: text("destino").notNull(),
+  codigo_hash: text("codigo_hash").notNull(),
+  expira_at: timestamp("expira_at", { withTimezone: true }).notNull(),
+  intentos: integer("intentos").notNull().default(0),
+  usado_at: timestamp("usado_at", { withTimezone: true }),
+  created_at: createdAt(),
+}, (t) => [index("web_otp_destino").on(t.destino)]);

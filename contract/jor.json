@@ -759,11 +759,16 @@
           "type": "uuid"
         },
         {
+          "name": "contact_id",
+          "type": "uuid"
+        },
+        {
           "name": "tipologia",
           "type": "enum",
           "enum": [
             "traslado_no_presentado",
             "consulta",
+            "emergencia",
             "otra"
           ]
         },
@@ -773,7 +778,8 @@
           "enum": [
             "baja",
             "media",
-            "alta"
+            "alta",
+            "critica"
           ]
         },
         {
@@ -804,6 +810,14 @@
         },
         {
           "name": "feedback",
+          "type": "longtext"
+        },
+        {
+          "name": "requiere_humano",
+          "type": "boolean"
+        },
+        {
+          "name": "resumen_ia",
           "type": "longtext"
         }
       ]
@@ -824,11 +838,16 @@
           "type": "uuid"
         },
         {
+          "name": "contact_id",
+          "type": "uuid"
+        },
+        {
           "name": "tipologia",
           "type": "enum",
           "enum": [
             "traslado_no_presentado",
             "consulta",
+            "emergencia",
             "otra"
           ]
         },
@@ -838,7 +857,8 @@
           "enum": [
             "baja",
             "media",
-            "alta"
+            "alta",
+            "critica"
           ]
         },
         {
@@ -870,6 +890,14 @@
         {
           "name": "feedback",
           "type": "longtext"
+        },
+        {
+          "name": "requiere_humano",
+          "type": "boolean"
+        },
+        {
+          "name": "resumen_ia",
+          "type": "longtext"
         }
       ]
     },
@@ -888,13 +916,15 @@
           "name": "tipo",
           "type": "enum",
           "enum": [
+            "identificacion",
             "mensaje_viajero",
             "mensaje_proveedor",
             "espera",
             "decision",
             "autorizacion",
             "escalado",
-            "resultado"
+            "resultado",
+            "feedback"
           ],
           "required": true
         },
@@ -923,13 +953,15 @@
           "name": "tipo",
           "type": "enum",
           "enum": [
+            "identificacion",
             "mensaje_viajero",
             "mensaje_proveedor",
             "espera",
             "decision",
             "autorizacion",
             "escalado",
-            "resultado"
+            "resultado",
+            "feedback"
           ],
           "required": true
         },
@@ -977,6 +1009,11 @@
         {
           "name": "tope_autorizado",
           "type": "money"
+        },
+        {
+          "name": "moneda",
+          "type": "text",
+          "pattern": "^[A-Z]{3}$"
         }
       ]
     },
@@ -1014,6 +1051,11 @@
         {
           "name": "tope_autorizado",
           "type": "money"
+        },
+        {
+          "name": "moneda",
+          "type": "text",
+          "pattern": "^[A-Z]{3}$"
         }
       ]
     },
@@ -1170,6 +1212,70 @@
         {
           "name": "datos",
           "type": "object"
+        }
+      ]
+    },
+    {
+      "id": "listOnCallList",
+      "name": "Listar guardia",
+      "kind": "query",
+      "resource": "on_call",
+      "fields": [
+        {
+          "name": "nombre",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "email",
+          "type": "email",
+          "required": true
+        },
+        {
+          "name": "telefono",
+          "type": "text",
+          "pattern": "^\\+?[0-9]{7,15}$"
+        },
+        {
+          "name": "prioridad",
+          "type": "integer",
+          "min": 1
+        },
+        {
+          "name": "activo",
+          "type": "boolean"
+        }
+      ]
+    },
+    {
+      "id": "createOnCall",
+      "name": "Crear guardia",
+      "kind": "mutation",
+      "resource": "on_call",
+      "fields": [
+        {
+          "name": "nombre",
+          "type": "text",
+          "required": true
+        },
+        {
+          "name": "email",
+          "type": "email",
+          "required": true
+        },
+        {
+          "name": "telefono",
+          "type": "text",
+          "pattern": "^\\+?[0-9]{7,15}$"
+        },
+        {
+          "name": "prioridad",
+          "type": "integer",
+          "min": 1
+        },
+        {
+          "name": "activo",
+          "type": "boolean"
         }
       ]
     }

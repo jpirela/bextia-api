@@ -2,6 +2,7 @@
 export const CHANNELS = ["whatsapp", "email", "web", "form", "sim"];
 const LANGS = ["es", "en", "pt", "fr", "it", "de"];
 const URGENCY = ["baja", "media", "alta"];
+const INCIDENT_URGENCY = ["baja", "media", "alta", "critica"];
 const AGENTS = ["leads", "incidents"];
 const LEAD_TYPES = ["vacacional", "luna_de_miel", "grupo", "corporativo", "otro"];
 const PHONE = "^\\+?[0-9]{7,15}$";
@@ -76,17 +77,20 @@ export const resources = [
   { resource: "incident", singular: "Incident", plural: "Incidents", label: "incidencia", fields: [
     { name: "booking_id", type: "uuid", required: true },
     { name: "conversation_id", type: "uuid" },
-    { name: "tipologia", type: "enum", enum: ["traslado_no_presentado", "consulta", "otra"] },
-    { name: "urgencia", type: "enum", enum: URGENCY },
+    { name: "contact_id", type: "uuid" },
+    { name: "tipologia", type: "enum", enum: ["traslado_no_presentado", "consulta", "emergencia", "otra"] },
+    { name: "urgencia", type: "enum", enum: INCIDENT_URGENCY },
     { name: "estado", type: "enum", enum: ["identificando", "bienvenida", "clasificando", "protocolo", "conversacional", "escalado", "seguimiento", "cerrado"] },
     { name: "protocol_id", type: "uuid" },
     { name: "escalado_a", type: "text" },
     { name: "sla_vence", type: "datetime" },
     { name: "feedback", type: "longtext" },
+    { name: "requiere_humano", type: "boolean" },
+    { name: "resumen_ia", type: "longtext" },
   ] },
   { resource: "incident_action", singular: "IncidentAction", plural: "IncidentActions", label: "acción", fields: [
     { name: "incident_id", type: "uuid", required: true },
-    { name: "tipo", type: "enum", enum: ["mensaje_viajero", "mensaje_proveedor", "espera", "decision", "autorizacion", "escalado", "resultado"], required: true },
+    { name: "tipo", type: "enum", enum: ["identificacion", "mensaje_viajero", "mensaje_proveedor", "espera", "decision", "autorizacion", "escalado", "resultado", "feedback"], required: true },
     { name: "detalle", type: "object" },
     { name: "monto", type: "money" },
   ] },
@@ -97,6 +101,7 @@ export const resources = [
     { name: "activo", type: "boolean" },
     { name: "definicion", type: "object", required: true },
     { name: "tope_autorizado", type: "money" },
+    { name: "moneda", type: "text", pattern: "^[A-Z]{3}$" },
   ] },
   { resource: "kb_article", singular: "KbArticle", plural: "KbArticles", label: "artículo", fields: [
     { name: "titulo", type: "text", required: true },
@@ -111,5 +116,12 @@ export const resources = [
     { name: "valor", type: "number" },
     { name: "ref_id", type: "uuid" },
     { name: "datos", type: "object" },
+  ] },
+  { resource: "on_call", singular: "OnCall", plural: "OnCallList", label: "guardia", fields: [
+    { name: "nombre", type: "text", required: true },
+    { name: "email", type: "email", required: true },
+    { name: "telefono", type: "text", pattern: PHONE },
+    { name: "prioridad", type: "integer", min: 1 },
+    { name: "activo", type: "boolean" },
   ] },
 ];
