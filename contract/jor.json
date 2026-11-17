@@ -542,6 +542,14 @@
           "type": "text"
         },
         {
+          "name": "horario",
+          "type": "object"
+        },
+        {
+          "name": "festivos",
+          "type": "array"
+        },
+        {
           "name": "activo",
           "type": "boolean"
         }
@@ -582,6 +590,14 @@
         {
           "name": "zona_horaria",
           "type": "text"
+        },
+        {
+          "name": "horario",
+          "type": "object"
+        },
+        {
+          "name": "festivos",
+          "type": "array"
         },
         {
           "name": "activo",
