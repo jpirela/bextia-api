@@ -55,6 +55,8 @@ export const resources = [
     { name: "mercados", type: "array" },
     { name: "tipos_lead", type: "array" },
     { name: "zona_horaria", type: "text" },
+    { name: "horario", type: "object" },
+    { name: "festivos", type: "array" },
     { name: "activo", type: "boolean" },
   ] },
   { resource: "business_hours", singular: "BusinessHours", plural: "BusinessHoursList", label: "horario", fields: [

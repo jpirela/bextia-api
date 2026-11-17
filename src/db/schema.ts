@@ -81,6 +81,8 @@ export const sales_agent = pgTable("sales_agent", {
   mercados: text("mercados").array().notNull().default([]),
   tipos_lead: text("tipos_lead").array().notNull().default([]),
   zona_horaria: text("zona_horaria"),
+  horario: jsonb("horario").$type<WeeklyHours>(),
+  festivos: text("festivos").array().notNull().default([]),
   activo: boolean("activo").notNull().default(true),
   created_at: createdAt(),
 });
