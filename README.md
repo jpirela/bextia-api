@@ -1,7 +1,16 @@
-# bextia-agentes
+# bextia-api
 
 API generada por jor-cli. La validación de entrada usa [Clark](https://www.npmjs.com/package/@jorgepirelarivas/clark); cada handler devuelve un envelope `{ data, meta }`.
 
+Contiene además el contrato (`contract/`, se regenera con `yarn contract`), el `program.json` de Louis y el material de descubrimiento (`discovery/`, `knowledge_base/`, `docs/`, `assets/`, `demos/`).
+
+## Esquema compartido
+
+El esquema Drizzle (`src/db/schema.ts`) se publica como `@bextia/api/schema`. Los agentes y el backoffice de [bextia-apps](https://github.com/jpirela/bextia-apps) lo consumen como dependencia git fijada a un tag:
+
+    "@bextia/api": "github:jpirela/bextia-api#v0.1.0"
+
+Un cambio en el esquema exige un tag nuevo y subir la versión en bextia-apps. La documentación del proyecto está en [bextia-entregables](https://github.com/jpirela/bextia-entregables).
 ## Funcionalidades
 
 - `listContacts` — Listar contacto (query)
@@ -31,9 +40,8 @@ API generada por jor-cli. La validación de entrada usa [Clark](https://www.npmj
 
 ## Despliegue
 
-Proyecto autocontenido: no depende de ningún workspace. Commitea **un solo**
-lockfile (`package-lock.json` o `yarn.lock`, no ambos) — con los dos, el
-gestor que elige la plataforma deja de ser determinista.
+Proyecto autocontenido: no depende de ningún workspace. Gestor de paquetes: yarn
+(un solo lockfile, `yarn.lock`).
 
 Variables a registrar en el panel de la plataforma (ver `.env.example`):
 
